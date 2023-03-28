@@ -53,6 +53,24 @@ func (c *CustomerClient) GetCustomer(customerId string) (*Customer, error) {
 	return customer, nil
 }
 
+func (c *CustomerClient) ListAllCustomers() ([]Customer, error) {
+	signature := "ListAllCustomers()"
+	var customers []Customer
+	urlGet := fmt.Sprintf("%s/customers", Endpoint)
+	data, err := c.AmberfloHttpClient.sendHttpRequest("Customers", urlGet, "GET", nil)
+	if err != nil {
+		return nil, fmt.Errorf("error sending request: %s", err)
+	}
+	if data != nil && string(data) != "{}" {
+		err = json.Unmarshal(data, &customers)
+		if err != nil {
+			return nil, fmt.Errorf("%s Error reading JSON body: %s", signature, err)
+		}
+	}
+
+	return customers, nil
+}
+
 func (c *CustomerClient) sendCustomerToApi(payload *Customer, createInStripe bool) (*Customer, error) {
 	signature := fmt.Sprintf("sendCustomerToApi(%v)", payload)
 
